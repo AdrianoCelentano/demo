@@ -9,6 +9,10 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import com.example.demo.model.User
+import com.example.demo.repository.UserRepository
+import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.http.HttpStatus
 
 data class UsernamePasswordRequest(
     val username: String,
@@ -24,7 +28,9 @@ data class JwtResponse(
 class AuthController(
     private val authenticationManager: AuthenticationManager,
     private val userDetailsService: CustomUserDetailsService,
-    private val jwtService: JwtService
+    private val jwtService: JwtService,
+    private val userRepository: UserRepository,
+    private val passwordEncoder: PasswordEncoder
 ) {
 
     @PostMapping("/login")
@@ -33,6 +39,24 @@ class AuthController(
             UsernamePasswordAuthenticationToken(request.username, request.password)
         )
         
+        val userDetails = userDetailsService.loadUserByUsername(request.username)
+        val jwtToken = jwtService.generateToken(userDetails)
+        
+        return ResponseEntity.ok(JwtResponse(jwtToken))
+    }
+
+    @PostMapping("/register")
+    fun register(@RequestBody request: UsernamePasswordRequest): ResponseEntity<Any> {
+        if (userRepository.existsByUsername(request.username)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("error" to "Username already exists"))
+        }
+
+        val newUser = User(
+            username = request.username,
+            passwordHash = passwordEncoder.encode(request.password)!!
+        )
+        userRepository.save(newUser)
+
         val userDetails = userDetailsService.loadUserByUsername(request.username)
         val jwtToken = jwtService.generateToken(userDetails)
         
