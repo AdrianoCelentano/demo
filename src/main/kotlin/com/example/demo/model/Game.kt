@@ -14,7 +14,7 @@ data class LatLng(
 )
 
 data class Tower(
-    val isActive: Boolean,
+    val isActive: Boolean = false,
     val position: LatLng
 )
 
@@ -27,6 +27,7 @@ data class Player(
 @RedisHash("Game")
 data class Game(
     @Id val id: String? = null,
+    val playgroundBoundaries: List<LatLng> = emptyList(),
     val players: List<Player> = emptyList(),
     val towers: List<Tower> = emptyList()
 )
@@ -34,3 +35,9 @@ data class Game(
 data class CreateGameRequest(
     val team: Team = Team.DETECTIVE
 )
+
+data class JoinGameRequest(
+    val gameId: String,
+    val team: Team = Team.MISTER_X
+)
+

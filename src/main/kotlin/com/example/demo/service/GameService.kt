@@ -1,18 +1,24 @@
 package com.example.demo.service
 
 import com.example.demo.model.Game
+import com.example.demo.model.JoinGameRequest
 import com.example.demo.model.LatLng
 import com.example.demo.model.Player
 import com.example.demo.model.Team
+import com.example.demo.model.Tower
+import com.example.demo.model.eggensteinMap
+import com.example.demo.model.eggensteinTowers
 import com.example.demo.repository.GameRepository
 import com.example.demo.repository.UserRepository
 import org.springframework.stereotype.Service
+import java.util.UUID
 
 @Service
 class GameService(
     private val gameRepository: GameRepository,
     private val userRepository: UserRepository
 ) {
+
     fun createGame(username: String, chosenTeam: Team): Game {
         val user = userRepository.findByUsername(username)
             .orElseThrow { IllegalArgumentException("User not found") }
@@ -20,14 +26,50 @@ class GameService(
         val initialPlayer = Player(
             userId = user.id,
             team = chosenTeam,
-            position = LatLng(0.0, 0.0) // Provide a default or initial position
+            position = LatLng(0.0, 0.0)
         )
 
         val game = Game(
+            id = UUID.randomUUID().toString(),
             players = listOf(initialPlayer),
-            towers = emptyList() // You can add logic later to initialize towers
+            towers = generateRandomTowers(),
+            playgroundBoundaries = eggensteinMap
         )
-        
+
         return gameRepository.save(game)
+    }
+
+    private fun generateRandomTowers(): List<Tower> {
+        return eggensteinTowers.shuffled().take(3)
+    }
+
+    /** Returns all games that have exactly one player (open/waiting games). */
+    fun findOpenGames(): List<Game> {
+        return gameRepository.findAll()
+            .filter { it.players.size == 1 }
+    }
+
+    fun findById(id: String): Game {
+        return gameRepository.findById(id)
+            .orElseThrow { NoSuchElementException("Game not found: $id") }
+    }
+
+    fun joinGame(username: String, request: JoinGameRequest): Game {
+        val user = userRepository.findByUsername(username)
+            .orElseThrow { IllegalArgumentException("User not found") }
+
+        val game = gameRepository.findById(request.gameId)
+            .orElseThrow { NoSuchElementException("Game not found: ${request.gameId}") }
+
+        require(game.players.size == 1) { "Game is already full or has no players" }
+
+        val newPlayer = Player(
+            userId = user.id,
+            team = request.team,
+            position = LatLng(0.0, 0.0)
+        )
+
+        val updatedGame = game.copy(players = game.players + newPlayer)
+        return gameRepository.save(updatedGame)
     }
 }
