@@ -1,0 +1,31 @@
+### Variables
+@host = http://localhost:8080
+@gameId = {{createGame.response.body.id}}
+
+### 1. Create a New Game
+# This will default to Team.DETECTIVE based on your logic
+# @name createGame
+POST {{host}}/api/games
+Content-Type: application/json
+
+### 2. List All Open Games
+# Returns games with exactly 1 player waiting
+GET {{host}}/api/games
+Accept: application/json
+
+### 3. Get a Specific Game by ID
+# Uses the ID from the first request if run in order
+GET {{host}}/api/game/d30a1c6a-e3d7-4450-beed-510cbd5409a4
+Accept: application/json
+
+### 4. Join an Existing Game
+# Note: You'll need to provide a valid gameId from the list above
+POST {{host}}/api/game/join
+Content-Type: application/json
+
+{
+  "gameId": "d30a1c6a-e3d7-4450-beed-510cbd5409a4"
+}
+
+### 5. Test 404 (Non-existent Game)
+GET {{host}}/api/game/non-existent-uuid-123

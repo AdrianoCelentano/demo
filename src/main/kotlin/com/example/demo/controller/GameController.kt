@@ -25,10 +25,8 @@ class GameController(
     @PostMapping("/games")
     fun createGame(
 //        principal: Principal,
-        @RequestBody(required = false) request: CreateGameRequest?
     ): ResponseEntity<Game> {
-        val team = request?.team ?: Team.DETECTIVE
-        val game = gameService.createGame(UUID.randomUUID().toString(), team)
+        val game = gameService.createGame(Team.DETECTIVE)
 //        val game = gameService.createGame(principal.name, team)
         return ResponseEntity.ok(game)
     }

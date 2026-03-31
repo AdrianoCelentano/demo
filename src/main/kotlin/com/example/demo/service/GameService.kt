@@ -12,6 +12,7 @@ import com.example.demo.repository.GameRepository
 import com.example.demo.repository.UserRepository
 import org.springframework.stereotype.Service
 import java.util.UUID
+import kotlin.random.Random
 
 @Service
 class GameService(
@@ -19,12 +20,13 @@ class GameService(
     private val userRepository: UserRepository
 ) {
 
-    fun createGame(username: String, chosenTeam: Team): Game {
-        val user = userRepository.findByUsername(username)
-            .orElseThrow { IllegalArgumentException("User not found") }
+    fun createGame(chosenTeam: Team): Game {
+//        val user = userRepository.findByUsername(username)
+//            .orElseThrow { IllegalArgumentException("User not found") }
 
         val initialPlayer = Player(
-            userId = user.id,
+            // random Long
+            userId = Random.nextLong(0, 1000),
             team = chosenTeam,
             position = LatLng(0.0, 0.0)
         )
@@ -55,8 +57,8 @@ class GameService(
     }
 
     fun joinGame(username: String, request: JoinGameRequest): Game {
-        val user = userRepository.findByUsername(username)
-            .orElseThrow { IllegalArgumentException("User not found") }
+//        val user = userRepository.findByUsername(username)
+//            .orElseThrow { IllegalArgumentException("User not found") }
 
         val game = gameRepository.findById(request.gameId)
             .orElseThrow { NoSuchElementException("Game not found: ${request.gameId}") }
@@ -64,8 +66,8 @@ class GameService(
         require(game.players.size == 1) { "Game is already full or has no players" }
 
         val newPlayer = Player(
-            userId = user.id,
-            team = request.team,
+            userId = Random.nextLong(0, 1000),
+            team = Team.MISTER_X,
             position = LatLng(0.0, 0.0)
         )
 

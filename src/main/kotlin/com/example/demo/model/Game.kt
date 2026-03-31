@@ -37,7 +37,6 @@ data class CreateGameRequest(
 )
 
 data class JoinGameRequest(
-    val gameId: String,
-    val team: Team = Team.MISTER_X
+    val gameId: String
 )
 
