@@ -74,4 +74,25 @@ class GameService(
         val updatedGame = game.copy(players = game.players + newPlayer)
         return gameRepository.save(updatedGame)
     }
+
+    fun deleteGame(id: String) {
+        if (!gameRepository.existsById(id)) {
+            throw NoSuchElementException("Game not found: $id")
+        }
+        gameRepository.deleteById(id)
+    }
+
+    fun activateTower(gameId: String, towerIndex: Int): Game {
+        val game = findById(gameId)
+        
+        if (towerIndex !in game.towers.indices) {
+            throw IllegalArgumentException("Invalid tower index: $towerIndex")
+        }
+
+        val updatedTowers = game.towers.toMutableList()
+        updatedTowers[towerIndex] = updatedTowers[towerIndex].copy(isActive = true)
+
+        val updatedGame = game.copy(towers = updatedTowers)
+        return gameRepository.save(updatedGame)
+    }
 }

@@ -40,3 +40,8 @@ data class JoinGameRequest(
     val gameId: String
 )
 
+data class ActivateTowerRequestDto(
+    val gameId: String,
+    val towerIndex: Int,
+)
+
