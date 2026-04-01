@@ -1,5 +1,6 @@
 ### Variables
-@host = http://localhost:8080
+@host = https://demo-2c7p.onrender.com
+#@host = http://localhost:8080
 @gameId = {{createGame.response.body.id}}
 
 ### 1. Create a New Game
