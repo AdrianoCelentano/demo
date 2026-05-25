@@ -22,31 +22,20 @@ class SecurityConfig(
     private val userDetailsService: UserDetailsService
 ) {
 
-//    @Bean
-//    fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
-//        http
-//            .csrf { it.disable() }
-//            .authorizeHttpRequests { auth ->
-//                auth
-//                    .requestMatchers("/auth/**", "/api/**").permitAll()
-//                    .anyRequest().authenticated()
-//            }
-//            .sessionManagement { session ->
-//                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//            }
-//
-//            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter::class.java)
-//
-//        return http.build()
-//    }
-
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
         http
-            .csrf { it.disable() } // Critical for POST requests from Android
-            .authorizeHttpRequests { auth ->
-                auth.anyRequest().permitAll() // Allow everything for testing
+            .csrf { it.disable() }
+            .sessionManagement { session ->
+                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             }
+            .authorizeHttpRequests { auth ->
+                auth
+                    .requestMatchers("/auth/**").permitAll()
+                    .anyRequest().authenticated()
+            }
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter::class.java)
+
         return http.build()
     }
 
