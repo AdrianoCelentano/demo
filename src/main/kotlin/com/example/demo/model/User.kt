@@ -13,9 +13,9 @@ class User(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 
-    val username: String,
+    val username: String = "",
 
-    val passwordHash: String,
+    val passwordHash: String = "",
 
     val role: String = "ROLE_USER"
 )
